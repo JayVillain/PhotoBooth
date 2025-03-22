@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoBooth Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1><i class="fa-solid fa-camera"></i> PhotoBooth Pro</h1>
+        </header>
+
+        <main>
+            <div class="booth-container">
+                <!-- Camera View -->
+                <div id="camera-view">
+                    <video id="video" autoplay playsinline></video>
+                    <div id="countdown-overlay" class="hidden">
+                        <div id="countdown">3</div>
+                    </div>
+                    <div id="flash-overlay" class="hidden"></div>
+                    
+                    <!-- Sticker Overlay -->
+                    <div id="sticker-container"></div>
+                    
+                    <!-- Frame Overlay -->
+                    <div id="frame-overlay" class="hidden"></div>
+                </div>
+
+                <!-- Captured Photo -->
+                <div id="photo-preview" class="hidden">
+                    <canvas id="canvas"></canvas>
+                    <img id="photo" alt="Captured photo">
+                </div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="capture">Capture</button>
+                        <button class="tab-btn" data-tab="filters">Filters</button>
+                        <button class="tab-btn" data-tab="stickers">Stickers</button>
+                        <button class="tab-btn" data-tab="frames">Frames</button>
+                        <button class="tab-btn" data-tab="settings">Settings</button>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Capture Tab -->
+                        <div id="capture-tab" class="tab-pane active">
+                            <button id="startBtn" class="primary-btn"><i class="fa-solid fa-video"></i> Start Camera</button>
+                            <button id="captureBtn" class="primary-btn" disabled><i class="fa-solid fa-camera"></i> Take Photo</button>
+                            <button id="timerBtn" class="secondary-btn" disabled><i class="fa-solid fa-clock"></i> Timer (3s)</button>
+                            <button id="burstBtn" class="secondary-btn" disabled><i class="fa-solid fa-images"></i> Burst Mode</button>
+                            <button id="retakeBtn" class="primary-btn hidden"><i class="fa-solid fa-rotate"></i> Retake</button>
+                        </div>
+                        
+                        <!-- Filters Tab -->
+                        <div id="filters-tab" class="tab-pane">
+                            <h3>Choose a Filter</h3>
+                            <div class="filter-grid">
+                                <button class="filter-btn active" data-filter="normal">Normal</button>
+                                <button class="filter-btn" data-filter="grayscale">Grayscale</button>
+                                <button class="filter-btn" data-filter="sepia">Sepia</button>
+                                <button class="filter-btn" data-filter="invert">Invert</button>
+                                <button class="filter-btn" data-filter="vintage">Vintage</button>
+                                <button class="filter-btn" data-filter="blueprint">Blueprint</button>
+                                <button class="filter-btn" data-filter="polaroid">Polaroid</button>
+                                <button class="filter-btn" data-filter="noir">Noir</button>
+                                <button class="filter-btn" data-filter="brightness">Bright</button>
+                                <button class="filter-btn" data-filter="contrast">High Contrast</button>
+                                <button class="filter-btn" data-filter="vignette">Vignette</button>
+                                <button class="filter-btn" data-filter="blur">Blur</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Stickers Tab -->
+                        <div id="stickers-tab" class="tab-pane">
+                            <h3>Add Stickers</h3>
+                            <div class="sticker-grid">
+                                <button class="sticker-btn" data-sticker="sunglasses"><i class="fa-solid fa-sunglasses"></i> Sunglasses</button>
+                                <button class="sticker-btn" data-sticker="hat"><i class="fa-solid fa-hat-cowboy"></i> Hat</button>
+                                <button class="sticker-btn" data-sticker="mustache"><i class="fa-solid fa-user"></i> Mustache</button>
+                                <button class="sticker-btn" data-sticker="heart"><i class="fa-solid fa-heart"></i> Heart</button>
+                                <button class="sticker-btn" data-sticker="star"><i class="fa-solid fa-star"></i> Star</button>
+                                <button class="sticker-btn" data-sticker="crown"><i class="fa-solid fa-crown"></i> Crown</button>
+                                <button class="sticker-btn" data-sticker="bubble"><i class="fa-solid fa-comment"></i> Speech</button>
+                                <button class="sticker-btn" data-sticker="fire"><i class="fa-solid fa-fire"></i> Fire</button>
+                            </div>
+                            <button id="clearStickersBtn" class="secondary-btn"><i class="fa-solid fa-broom"></i> Clear All Stickers</button>
+                        </div>
+                        
+                        <!-- Frames Tab -->
+                        <div id="frames-tab" class="tab-pane">
+                            <h3>Choose a Frame</h3>
+                            <div class="frame-grid">
+                                <button class="frame-btn active" data-frame="none">None</button>
+                                <button class="frame-btn" data-frame="polaroid">Polaroid</button>
+                                <button class="frame-btn" data-frame="vintage">Vintage</button>
+                                <button class="frame-btn" data-frame="modern">Modern</button>
+                                <button class="frame-btn" data-frame="rounded">Rounded</button>
+                                <button class="frame-btn" data-frame="instant">Instant</button>
+                                <button class="frame-btn" data-frame="filmstrip">Filmstrip</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Settings Tab -->
+                        <div id="settings-tab" class="tab-pane">
+                            <h3>Camera Settings</h3>
+                            <div class="settings-group">
+                                <label for="cameraSelect">Camera Source:</label>
+                                <select id="cameraSelect">
+                                    <option value="">Loading cameras...</option>
+                                </select>
+                            </div>
+                            <div class="settings-group">
+                                <label for="resolutionSelect">Resolution:</label>
+                                <select id="resolutionSelect">
+                                    <option value="hd">HD (1280x720)</option>
+                                    <option value="full-hd" selected>Full HD (1920x1080)</option>
+                                    <option value="4k">4K (3840x2160)</option>
+                                </select>
+                            </div>
+                            <div class="settings-group">
+                                <label for="timerDuration">Timer Duration (seconds):</label>
+                                <input type="range" id="timerDuration" min="1" max="10" value="3" />
+                                <span id="timerValue">3</span>
+                            </div>
+                            <div class="settings-group">
+                                <label for="burstCount">Burst Photo Count:</label>
+                                <input type="range" id="burstCount" min="2" max="10" value="4" />
+                                <span id="burstValue">4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Panel -->
+            <div class="gallery-panel">
+                <h3>Recent Photos <button id="clearGalleryBtn" class="mini-btn"><i class="fa-solid fa-trash"></i></button></h3>
+                <div id="photo-gallery" class="photo-grid"></div>
+            </div>
+            
+            <!-- Share and Download Options -->
+            <div class="action-panel hidden" id="action-panel">
+                <button id="downloadBtn" class="action-btn"><i class="fa-solid fa-download"></i> Download</button>
+                <div class="dropdown">
+                    <button id="formatDropdownBtn" class="action-btn"><i class="fa-solid fa-file-image"></i> Format <i class="fa-solid fa-caret-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="#" data-format="png">PNG Image</a>
+                        <a href="#" data-format="jpeg">JPEG Image</a>
+                        <a href="#" data-format="webp">WebP Image</a>
+                    </div>
+                </div>
+                <button id="shareBtn" class="action-btn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                <button id="printBtn" class="action-btn"><i class="fa-solid fa-print"></i> Print</button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 PhotoBooth Pro - Created with HTML5, CSS3, and JavaScript</p>
+        </footer>
+    </div>
+    
+    <!-- Modal Templates -->
+    <div id="modal-overlay" class="hidden">
+        <div id="share-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3>Share Your Photo</h3>
+                <button class="close-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <button class="share-btn" data-platform="facebook"><i class="fa-brands fa-facebook"></i> Facebook</button>
+                    <button class="share-btn" data-platform="twitter"><i class="fa-brands fa-twitter"></i> Twitter</button>
+                    <button class="share-btn" data-platform="instagram"><i class="fa-brands fa-instagram"></i> Instagram</button>
+                    <button class="share-btn" data-platform="whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+                    <button class="share-btn" data-platform="email"><i class="fa-solid fa-envelope"></i> Email</button>
+                </div>
+                <div class="share-link-container">
+                    <input type="text" id="share-link" readonly>
+                    <button id="copy-link-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="burst-preview-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3>Burst Photos</h3>
+                <button class="close-modal"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="burst-photos-container" class="burst-grid"></div>
+                <div class="burst-actions">
+                    <button id="save-all-burst" class="secondary-btn"><i class="fa-solid fa-save"></i> Save All</button>
+                    <button id="save-selected-burst" class="secondary-btn"><i class="fa-solid fa-check-square"></i> Save Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="stickers.js"></script>
+    <script src="filters.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
